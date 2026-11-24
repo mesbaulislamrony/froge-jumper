@@ -1,6 +1,6 @@
-# Little Climber
+# froge Jumper
 
-A cheerful, no-rush typing adventure for young learners. Little Climber is an original browser game built with React, TypeScript, and Vite. Its illustrated worlds use CSS and emoji—there are no external images, sound files, accounts, or services.
+A cheerful, no-rush typing adventure for young learners. froge Jumper is an original browser game built with React, TypeScript, and Vite. Its illustrated worlds use CSS and emoji—there are no external images, sound files, accounts, or services.
 
 ## Play
 

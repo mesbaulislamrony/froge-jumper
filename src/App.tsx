@@ -155,9 +155,9 @@ function App() {
   return (
     <main className={`app-shell theme-${level.theme}`}>
       <header className="topbar">
-        <a className="brand" href="#home" aria-label="Little Climber home" onClick={(event) => event.preventDefault()}>
+        <a className="brand" href="#home" aria-label="froge Jumper home" onClick={(event) => event.preventDefault()}>
           <span className="brand-mark" aria-hidden="true">⛰️</span>
-          <span className="brand-copy"><strong>little climber</strong><small>little letters, big adventures</small></span>
+          <span className="brand-copy"><strong>froge Jumper</strong><small>little letters, big adventures</small></span>
         </a>
         <div className="top-actions">
           <button
@@ -175,7 +175,7 @@ function App() {
         </div>
       </header>
 
-      <section className="full-game" aria-label="Little Climber endless typing adventure">
+      <section className="full-game" aria-label="froge Jumper endless typing adventure">
           <div className={`scene full-scene ${level.theme}`} aria-label={`${level.name} climbing scene`}>
             <Background theme={level.theme} colors={level.colors} />
             <div className="scene-level-heading">
