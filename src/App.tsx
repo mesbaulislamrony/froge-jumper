@@ -1,55 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import {
-  Heart,
   Lightbulb,
   RotateCcw,
   Volume2,
   VolumeX,
 } from 'lucide-react';
-
-type Level = {
-  name: string;
-  subtitle: string;
-  emoji: string;
-  theme: string;
-  character: string;
-  scenery: string[];
-  success: string;
-};
-
-const LEVELS: Level[] = [
-  {
-    name: 'Jungle Jamboree',
-    subtitle: 'A leafy little climb',
-    emoji: '🌿',
-    theme: 'jungle',
-    character: '🐵',
-    scenery: ['🌴', '🌺', '🍃', '🥥', '🦜', '🌼'],
-    success: 'You made it through the jungle! Hooray!',
-  },
-  {
-    name: 'Cloudtop Cove',
-    subtitle: 'Up, up in the clouds',
-    emoji: '☁️',
-    theme: 'sky',
-    character: '🐵',
-    scenery: ['☁️', '🌈', '🐦', '🪁', '☀️', '☁️'],
-    success: 'You climbed all the way to Cloudtop Cove!',
-  },
-  {
-    name: 'Starlight Station',
-    subtitle: 'A cosmic letter quest',
-    emoji: '🚀',
-    theme: 'space',
-    character: '🐵',
-    scenery: ['🪐', '⭐', '🌙', '✨', '☄️', '🛸'],
-    success: 'Stellar work, space explorer!',
-  },
-];
+import { LEVELS } from './config';
+import Background from './components/Background';
+import Character from './components/Character';
+import LetterBubble from './components/LetterBubble';
+import Platform from './components/Platform';
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 const STEPS_PER_LEVEL = 10;
+const PLATFORM_COUNT = STEPS_PER_LEVEL + 3;
+const KEY_ROWS = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
 const ENCOURAGEMENTS = [
   'Oopsie! Let’s try that letter again.',
   'A little wobble! You’ve got this.',
@@ -182,8 +148,8 @@ function App() {
   };
 
   const climberStyle = {
-    left: `${12 + (step % 5) * 15}%`,
-    bottom: `${10 + Math.min(step, STEPS_PER_LEVEL) * 5}%`,
+    left: `${step % 2 === 0 ? 20 : 80}%`,
+    bottom: '17%',
   } as CSSProperties;
 
   return (
@@ -211,38 +177,53 @@ function App() {
 
       <section className="full-game" aria-label="Little Climber endless typing adventure">
           <div className={`scene full-scene ${level.theme}`} aria-label={`${level.name} climbing scene`}>
+            <Background theme={level.theme} colors={level.colors} />
             <div className="scene-level-heading">
               <div className="eyebrow"><span>{level.emoji}</span> ADVENTURE {levelIndex + 1} OF 3</div>
               <h1>{level.name}</h1>
               <p>{level.subtitle} <span aria-hidden="true">✦</span></p>
             </div>
-            <div className="mistake-bubble scene-mistakes" aria-label={`${mistakes} ${mistakes === 1 ? 'wobble' : 'wobbles'}`}>
-              <span className="heart-stack" aria-hidden="true"><Heart size={16} fill="currentColor" /><Heart size={16} fill="currentColor" /><Heart size={16} fill="currentColor" /></span>
-              <strong>{mistakes}</strong><small>{mistakes === 1 ? 'wobble' : 'wobbles'}</small>
+            <div className="scene-hud">
+              <div className="height-pill" aria-label={`${step} metres climbed`}><span aria-hidden="true">↟</span> {step}m</div>
+              <div className="banana-progress" aria-label={`Banana progress ${step} of ${STEPS_PER_LEVEL}`}>
+                {Array.from({ length: STEPS_PER_LEVEL }, (_, index) => (
+                  <svg key={index} className={`progress-banana ${index < step ? 'collected' : ''}`} viewBox="0 0 32 28" aria-hidden="true">
+                    <path d="M5 5c2 13 11 21 21 17 3-1 4-4 2-7-8 4-17-2-18-13Z" fill={index < step ? '#ffd84e' : '#bcb1df'} fillOpacity={index < step ? 1 : .55} stroke={index < step ? '#70482d' : '#7b6eaa'} strokeWidth="2.3" strokeLinejoin="round" />
+                    <path d="M5 5 3 2m4 2 2-3m18 14 3 1" fill="none" stroke={index < step ? '#75472a' : '#7b6eaa'} strokeWidth="2.5" strokeLinecap="round" />
+                    {index < step && <path d="M9 8q3 8 9 10" fill="none" stroke="#fff19b" strokeWidth="2" strokeLinecap="round" />}
+                  </svg>
+                ))}
+              </div>
+              <div className="coconut-counter" aria-label={`${mistakes} coconut ${mistakes === 1 ? 'bonk' : 'bonks'}`}>
+                <span className="coconut-icons" aria-hidden="true">
+                  {Array.from({ length: Math.min(mistakes, 5) }, (_, index) => <span key={index}>🥥</span>)}
+                  {mistakes === 0 && <span className="empty-coconut">🥥</span>}
+                </span>
+                <strong>{mistakes}</strong>
+              </div>
             </div>
-            <div className="scene-sun" aria-hidden="true">{level.theme === 'space' ? '🌙' : '☀️'}</div>
-            <div className="scene-decoration decor-one" aria-hidden="true">{level.scenery[0]}</div>
-            <div className="scene-decoration decor-two" aria-hidden="true">{level.scenery[1]}</div>
-            <div className="scene-decoration decor-three" aria-hidden="true">{level.scenery[2]}</div>
-            <div className="scene-decoration decor-four" aria-hidden="true">{level.scenery[3]}</div>
-            <div className="scene-decoration decor-five" aria-hidden="true">{level.scenery[4]}</div>
-            <div className="scene-decoration decor-six" aria-hidden="true">{level.scenery[5]}</div>
-            <div className="scene-cloud cloud-one" aria-hidden="true">☁️</div>
-            <div className="scene-cloud cloud-two" aria-hidden="true">☁️</div>
-            <div className="scene-platform platform-one"><span /></div>
-            <div className="scene-platform platform-two"><span /></div>
-            <div className="scene-platform platform-three"><span /></div>
-            <div className="scene-platform platform-four"><span /></div>
-            <div className="scene-platform platform-five"><span /></div>
+            <div className="platform-camera">
+              {Array.from({ length: PLATFORM_COUNT }, (_, index) => {
+                const side = index % 2 === 0 ? 'left' : 'right';
+                return (
+                  <Platform
+                    key={index}
+                    style={level.platformStyle}
+                    className={`platform-slot platform-slot-${index}`}
+                    position={{ [side]: '6%', bottom: `${13 + (index - step) * 18}%`, width: '31%' }}
+                    active={index === step}
+                  />
+                );
+              })}
+            </div>
+            {!isComplete && (
+              <div className="target-perch">
+                <LetterBubble letter={target} hinted={hintVisible} wobble={reaction === 'oops'} pop={reaction === 'jump'} onPress={() => handleLetter(target)} />
+              </div>
+            )}
             <div className={`climber ${reaction}`} style={climberStyle}>
-              <span className="climber-body" role="img" aria-label="Your monkey climber">{level.character}</span>
-              <span className="climber-sparkle" aria-hidden="true">✨</span>
-              {coconutVisible && <span className="head-coconut" aria-label="Coconut on monkey’s head">🥥</span>}
-              {!isComplete && (
-                <div className={`scene-target ${hintVisible ? 'hinting' : ''} ${coconutVisible ? 'bonked' : ''}`} aria-label={`Target letter ${target}`}>
-                  <button type="button" aria-label={`Tap or type ${target} to climb`} onClick={() => handleLetter(target)} aria-live="polite">{target}</button>
-                </div>
-              )}
+              <Character skin={level.skin} reaction={reaction === 'jump' ? 'jump' : reaction === 'oops' ? 'hit' : isComplete ? 'celebrate' : 'idle'} />
+              {coconutVisible && <span className="head-coconut" aria-label="Coconut on character’s head">🥥</span>}
             </div>
             {reaction === 'jump' && <div className="jump-stars" aria-hidden="true">✦ ✨ ✦</div>}
             {isComplete && (
@@ -253,7 +234,25 @@ function App() {
               </div>
             )}
             <div className="scene-caption"><span className="caption-dot" />{feedback || 'Take your time — there’s no rush!'}</div>
-            {!isComplete && <button type="button" className="hint-button scene-hint" onClick={handleHint}><Lightbulb size={17} /> Hint</button>}
+          </div>
+          <div className="keyboard-tray" aria-label="On-screen keyboard">
+            <div className="keyboard-heading"><span>Tap a letter or use your keyboard</span><button type="button" className="hint-button scene-hint" onClick={handleHint}><Lightbulb size={17} /> Hint</button></div>
+            <div className="virtual-keyboard">
+              {KEY_ROWS.map((row, rowIndex) => (
+                <div className={`key-row row-${rowIndex + 1}`} key={row}>
+                  {row.split('').map((letter) => (
+                    <button
+                      type="button"
+                      className={`keycap ${target === letter ? 'target-key' : ''} ${hintVisible && target === letter ? 'hint-pulse' : ''}`}
+                      key={letter}
+                      aria-label={`Letter ${letter}${target === letter ? ', target letter' : ''}`}
+                      aria-pressed={target === letter}
+                      onClick={() => handleLetter(letter)}
+                    >{letter}</button>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
       </section>
 
