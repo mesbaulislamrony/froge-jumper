@@ -224,8 +224,10 @@ function App() {
     <main className={`app-shell theme-${level.theme}`}>
       <header className="topbar">
         <a className="brand" href="#home" aria-label="froge Jumper home" onClick={(event) => event.preventDefault()}>
-          <span className="brand-mark" aria-hidden="true">⛰️</span>
-          <span className="brand-copy"><strong>froge Jumper</strong><small>little letters, big adventures</small></span>
+          <span className="brand-mark" aria-hidden="true">
+            <img src="avatar.svg" alt="" />
+          </span>
+          <span className="brand-copy"><strong>Froge Jumper</strong><small>little letters, big adventures</small></span>
         </a>
         <div className="top-actions">
           <button
