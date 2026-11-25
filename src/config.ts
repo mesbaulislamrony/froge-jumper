@@ -6,6 +6,8 @@ export type LevelConfig = {
   subtitle: string;
   emoji: string;
   theme: 'jungle' | 'sky' | 'space';
+  music: string;
+  musicVolume: number;
   skin: CharacterSkin;
   platformStyle: PlatformStyle;
   success: string;
@@ -27,6 +29,8 @@ export const LEVELS: LevelConfig[] = [
     subtitle: 'A leafy little climb',
     emoji: '🌿',
     theme: 'jungle',
+    music: '/music/sky.mp3',
+    musicVolume: 0.35,
     skin: 'monkey',
     platformStyle: 'grass',
     success: 'You made it through the jungle! Hooray!',
@@ -39,6 +43,8 @@ export const LEVELS: LevelConfig[] = [
     subtitle: 'Up, up in the clouds',
     emoji: '☁️',
     theme: 'sky',
+    music: '/music/sky.mp3',
+    musicVolume: 0.35,
     skin: 'chick',
     platformStyle: 'cloud',
     success: 'You climbed all the way to Cloudtop Cove!',
@@ -51,6 +57,8 @@ export const LEVELS: LevelConfig[] = [
     subtitle: 'A cosmic letter quest',
     emoji: '🚀',
     theme: 'space',
+    music: '/music/sky.mp3',
+    musicVolume: 0.35,
     skin: 'astronaut-cat',
     platformStyle: 'moon-rock',
     success: 'Stellar work, space explorer!',

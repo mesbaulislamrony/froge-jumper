@@ -7,6 +7,7 @@ import {
   VolumeX,
 } from 'lucide-react';
 import { LEVELS } from './config';
+import { duck, pauseMusic, playMusic, resumeMusic, setMusicEnabled } from './music';
 import Background from './components/Background';
 import Character from './components/Character';
 import LetterBubble from './components/LetterBubble';
@@ -66,6 +67,11 @@ function App() {
   const coconutTimeout = useRef<number | undefined>(undefined);
   const level = LEVELS[levelIndex];
   const isComplete = step >= STEPS_PER_LEVEL;
+  const musicUnlocked = useRef(false);
+  const soundEnabledRef = useRef(soundEnabled);
+  const levelRef = useRef(level);
+  soundEnabledRef.current = soundEnabled;
+  levelRef.current = level;
 
   const animate = useCallback((next: 'jump' | 'oops') => {
     window.clearTimeout(reactionTimeout.current);
@@ -77,6 +83,62 @@ function App() {
   useEffect(() => () => {
     window.clearTimeout(reactionTimeout.current);
     window.clearTimeout(coconutTimeout.current);
+  }, []);
+
+  useEffect(() => {
+    const unlockMusic = () => {
+      if (musicUnlocked.current) return;
+      musicUnlocked.current = true;
+      window.removeEventListener('keydown', unlockMusic);
+      window.removeEventListener('pointerdown', unlockMusic);
+
+      if (soundEnabledRef.current) {
+        const currentLevel = levelRef.current;
+        playMusic(currentLevel.music, currentLevel.musicVolume);
+        setMusicEnabled(true);
+      }
+    };
+
+    window.addEventListener('keydown', unlockMusic);
+    window.addEventListener('pointerdown', unlockMusic);
+    return () => {
+      window.removeEventListener('keydown', unlockMusic);
+      window.removeEventListener('pointerdown', unlockMusic);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (musicUnlocked.current && soundEnabled) {
+      playMusic(level.music, level.musicVolume);
+    }
+  }, [levelIndex, level.music, level.musicVolume, soundEnabled]);
+
+  useEffect(() => {
+    if (!soundEnabled) {
+      setMusicEnabled(false);
+      pauseMusic();
+      return;
+    }
+
+    if (musicUnlocked.current) {
+      playMusic(level.music, level.musicVolume);
+      setMusicEnabled(true);
+    } else {
+      setMusicEnabled(true);
+    }
+  }, [soundEnabled, level.music, level.musicVolume]);
+
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        pauseMusic();
+      } else if (musicUnlocked.current && soundEnabledRef.current) {
+        resumeMusic();
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
   }, []);
 
   useEffect(() => {
@@ -103,7 +165,10 @@ function App() {
       setHintVisible(false);
       setFeedback(nextStep === STEPS_PER_LEVEL ? level.success : 'That’s it! Up we go!');
       animate('jump');
-      if (soundEnabled) playTone(nextStep === STEPS_PER_LEVEL ? 'complete' : 'correct');
+      if (soundEnabled) {
+        duck();
+        playTone(nextStep === STEPS_PER_LEVEL ? 'complete' : 'correct');
+      }
       if (nextStep < STEPS_PER_LEVEL) {
         setTarget((previous) => pickLetter(previous));
       }
@@ -114,7 +179,10 @@ function App() {
       setCoconutVisible(true);
       coconutTimeout.current = window.setTimeout(() => setCoconutVisible(false), 1300);
       animate('oops');
-      if (soundEnabled) playTone('wrong');
+      if (soundEnabled) {
+        duck();
+        playTone('wrong');
+      }
     }
   }, [animate, isComplete, level.success, levelIndex, soundEnabled, step, target]);
 
